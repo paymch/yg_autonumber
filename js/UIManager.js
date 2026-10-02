@@ -224,6 +224,7 @@ class UIManager {
                         </div>`;
             } else {
                 html = `<span class="plate-char">${plate.sequence[0]}</span>
+                        <div class="plate-bolt inner-bolt left-bolt"></div>
                         <div class="plate-group">
                             <span class="plate-digit">${plate.sequence[1]}</span>
                             <span class="plate-digit">${plate.sequence[2]}</span>
