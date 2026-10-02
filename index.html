@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Симулятор Автономеров</title>
+    <!-- Yandex Games SDK -->
+    <script src="https://yandex.ru/games/sdk/v2"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Header -->
+        <header>
+            <div class="header-stat balance-stat">
+                <span class="label">Баланс:</span>
+                <span id="balance-display">100 000</span> ₽
+            </div>
+            <div class="header-buttons">
+                <button id="btn-inventory" class="btn-secondary">Гараж</button>
+                <button id="btn-bank" class="btn-secondary">Банк</button>
+            </div>
+        </header>
+
+        <!-- Loan Alert (Hidden by default) -->
+        <div id="loan-alert" class="hidden">
+            <span class="label">Кредит:</span>
+            <span id="loan-amount">0</span> ₽
+            <div class="timer-container">
+                ⏳ <span id="loan-timer">10:00</span>
+            </div>
+        </div>
+
+        <!-- Main Game Area -->
+        <main>
+            <div class="plate-container">
+                <div id="plate-wrapper" class="plate-wrapper normal state-new format-standard">
+                    <!-- Plate content will be generated here -->
+                    <div class="plate-inner">
+                        <div class="plate-main-part">
+                            <span class="plate-char char-1">А</span>
+                            <span class="plate-digit digit-1">0</span>
+                            <span class="plate-digit digit-2">0</span>
+                            <span class="plate-digit digit-3">0</span>
+                            <span class="plate-char char-2">А</span>
+                            <span class="plate-char char-3">А</span>
+                        </div>
+                        <div class="plate-region-part">
+                            <div class="region-code">77</div>
+                            <div class="region-flag">
+                                <span>RUS</span>
+                                <div class="flag"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="scan-line"></div>
+                </div>
+            </div>
+
+            <div id="combo-badges" class="combo-badges-container">
+                <!-- Badges will appear here -->
+            </div>
+
+            <div id="price-evaluation" class="price-evaluation hidden">
+                <div class="eval-title">Оценка номера</div>
+                <div id="eval-details" class="eval-details"></div>
+                <div class="eval-total">Итого: <span id="eval-total-price">0</span> ₽</div>
+            </div>
+
+            <div class="controls">
+                <button id="btn-spin" class="btn-primary spin-btn">
+                    Крутить <br><small>500 ₽</small>
+                </button>
+                <div class="action-buttons hidden" id="action-buttons">
+                    <button id="btn-sell" class="btn-success">Продать</button>
+                    <button id="btn-save" class="btn-warning">Сохранить <br><small>5 000 ₽</small></button>
+                </div>
+            </div>
+
+            <div class="ads-controls">
+                <button id="btn-reward" class="btn-reward hidden">📺 Бонус 10 000 ₽</button>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <!-- Bank Modal -->
+    <div id="modal-bank" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal">×</button>
+            <h2>Банк</h2>
+            <div id="bank-status">
+                <p>Кредитов нет.</p>
+            </div>
+            <div class="bank-actions">
+                <h3>Взять кредит (Комиссия 20%)</h3>
+                <p class="bank-warning">Таймер банкротства: 10 минут!</p>
+                <button class="btn-bank-action take-loan" data-amount="50000">50 000 ₽</button>
+                <button class="btn-bank-action take-loan" data-amount="100000">100 000 ₽</button>
+                <button class="btn-bank-action take-loan" data-amount="250000">250 000 ₽</button>
+            </div>
+            <div id="repay-section" class="hidden">
+                <h3>Погашение кредита</h3>
+                <button id="btn-repay-loan" class="btn-success">Погасить долг</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Inventory Modal -->
+    <div id="modal-inventory" class="modal hidden">
+        <div class="modal-content">
+            <button class="close-modal">×</button>
+            <h2>Гараж</h2>
+            <div class="inventory-stats">
+                Всего номеров: <span id="inventory-count">0</span>
+            </div>
+            <div id="inventory-list" class="inventory-list">
+                <!-- Inventory items -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="modal-gameover" class="modal hidden">
+        <div class="modal-content text-center">
+            <h2 class="text-danger">БАНКРОТСТВО</h2>
+            <p>Время вышло, а денег на счету не хватило для погашения кредита.</p>
+            <p>Всё имущество конфисковано.</p>
+            <button id="btn-restart" class="btn-primary mt-20">Начать заново</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/YandexSDKManager.js"></script>
+    <script src="js/SoundFX.js"></script>
+    <script src="js/PlateGenerator.js"></script>
+    <script src="js/ComboEvaluator.js"></script>
+    <script src="js/EconomyManager.js"></script>
+    <script src="js/UIManager.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
