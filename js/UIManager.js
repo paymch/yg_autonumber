@@ -15,6 +15,8 @@ class UIManager {
             plateWrapper: document.getElementById('plate-wrapper'),
             plateMain: document.querySelector('.plate-main-part'),
             plateRegionCode: document.querySelector('.region-code'),
+            plateStamp: document.getElementById('plate-stamp'),
+            vfxContainer: document.getElementById('vfx-container'),
             scanLine: document.querySelector('.scan-line'),
             comboBadges: document.getElementById('combo-badges'),
             priceEval: document.getElementById('price-evaluation'),
@@ -25,6 +27,7 @@ class UIManager {
             btnSell: document.getElementById('btn-sell'),
             btnSave: document.getElementById('btn-save'),
             btnInventory: document.getElementById('btn-inventory'),
+            headerInvCount: document.getElementById('header-inv-count'),
             btnBank: document.getElementById('btn-bank'),
             btnReward: document.getElementById('btn-reward'),
 
@@ -88,9 +91,37 @@ class UIManager {
         this.eco.onGameOver = () => this.showGameOver();
     }
 
+    animateValue(element, start, end, duration) {
+        let startTimestamp = null;
+        const step = (timestamp) => {
+            if (!startTimestamp) startTimestamp = timestamp;
+            const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+            // Ease out cubic
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const current = Math.floor(easeProgress * (end - start) + start);
+            element.innerText = current.toLocaleString('ru-RU');
+            if (progress < 1) {
+                window.requestAnimationFrame(step);
+            } else {
+                element.innerText = end.toLocaleString('ru-RU');
+            }
+        };
+        window.requestAnimationFrame(step);
+    }
+
     updateBalance(amount) {
-        this.el.balance.innerText = amount.toLocaleString('ru-RU');
+        const currentStr = this.el.balance.innerText.replace(/\D/g, '');
+        const currentNum = parseInt(currentStr) || 0;
+        if (amount !== currentNum) {
+            this.animateValue(this.el.balance, currentNum, amount, 500);
+        } else {
+            this.el.balance.innerText = amount.toLocaleString('ru-RU');
+        }
+
         this.el.btnSpin.disabled = amount < this.eco.spinCost;
+        if (this.el.headerInvCount) {
+            this.el.headerInvCount.innerText = `(${this.eco.inventory.length})`;
+        }
     }
 
     updateLoan(amount, remainingMs) {
@@ -126,7 +157,10 @@ class UIManager {
         this.el.actionBtns.classList.add('hidden');
         this.el.priceEval.classList.add('hidden');
         this.el.comboBadges.innerHTML = '';
+        this.el.plateStamp.classList.add('hidden');
+        this.el.plateStamp.classList.remove('stamp-anim');
         this.el.plateWrapper.classList.add('spinning');
+        this.el.vfxContainer.innerHTML = '';
 
         sounds.spin();
 
@@ -204,12 +238,57 @@ class UIManager {
         this.el.plateRegionCode.innerText = plate.region;
     }
 
+    spawnParticles(color1, color2, count) {
+        for (let i = 0; i < count; i++) {
+            const p = document.createElement('div');
+            p.className = 'particle';
+            const size = 5 + Math.random() * 8;
+            p.style.width = `${size}px`;
+            p.style.height = `${size}px`;
+            p.style.backgroundColor = Math.random() > 0.5 ? color1 : color2;
+
+            // Random position near center
+            p.style.left = `calc(50% + ${(Math.random() - 0.5) * 50}px)`;
+            p.style.top = `calc(50% + ${(Math.random() - 0.5) * 20}px)`;
+
+            // Random trajectory
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 50 + Math.random() * 150;
+            p.style.setProperty('--tx', `${Math.cos(angle) * distance}px`);
+            p.style.setProperty('--ty', `${Math.sin(angle) * distance}px`);
+
+            this.el.vfxContainer.appendChild(p);
+        }
+    }
+
     showResults() {
         sounds.win(this.currentEval.rarity);
 
         if (this.currentEval.rarity !== 'common') {
-            this.el.plateWrapper.classList.add('shake');
-            setTimeout(() => this.el.plateWrapper.classList.remove('shake'), 500);
+            this.el.plateWrapper.classList.add('plate-shake');
+            setTimeout(() => this.el.plateWrapper.classList.remove('plate-shake'), 500);
+        }
+
+        // VFX for high rarities
+        if (this.currentEval.rarity === 'mythic') {
+            this.el.plateWrapper.classList.add('plate-flare');
+            setTimeout(() => this.el.plateWrapper.classList.remove('plate-flare'), 600);
+            this.spawnParticles('#ef4444', '#fca5a5', 40);
+
+            this.el.plateStamp.innerText = "БЛАТНОЙ!";
+            this.el.plateStamp.classList.remove('hidden');
+            this.el.plateStamp.classList.add('stamp-anim');
+
+        } else if (this.currentEval.rarity === 'legendary') {
+            this.el.plateWrapper.classList.add('plate-flare');
+            setTimeout(() => this.el.plateWrapper.classList.remove('plate-flare'), 600);
+            this.spawnParticles('#fbbf24', '#fef3c7', 60);
+
+            this.el.plateStamp.innerText = "ДЖЕКПОТ!";
+            this.el.plateStamp.classList.remove('hidden');
+            this.el.plateStamp.classList.add('stamp-anim');
+        } else if (this.currentEval.rarity === 'epic') {
+            this.spawnParticles('#a855f7', '#d8b4fe', 20);
         }
 
         // Render Badges
@@ -234,9 +313,10 @@ class UIManager {
         }
 
         this.el.evalDetails.innerHTML = detailsHtml;
-        this.el.evalTotal.innerText = this.currentEval.finalPrice.toLocaleString();
 
         this.el.priceEval.classList.remove('hidden');
+        this.el.evalTotal.innerText = '0'; // reset for animation
+        this.animateValue(this.el.evalTotal, 0, this.currentEval.finalPrice, 500);
 
         // Show Actions
         this.el.actionBtns.classList.remove('hidden');
@@ -282,6 +362,9 @@ class UIManager {
         this.el.actionBtns.classList.add('hidden');
         this.el.priceEval.classList.add('hidden');
         this.el.comboBadges.innerHTML = '';
+        this.el.plateStamp.classList.add('hidden');
+        this.el.plateStamp.classList.remove('stamp-anim');
+        this.el.vfxContainer.innerHTML = '';
         this.el.btnSpin.classList.remove('hidden');
         this.el.plateWrapper.className = 'plate-wrapper normal state-new format-standard';
         this.el.plateMain.innerHTML = `<span class="plate-char char-1">?</span><span class="plate-digit digit-1">?</span><span class="plate-digit digit-2">?</span>`;
