@@ -1,13 +1,15 @@
 class EconomyManager {
     constructor(sdk) {
         this.sdk = sdk;
-        this.balance = 100000;
+        this.balance = 30000;
         this.inventory = [];
         this.loanAmount = 0;
         this.loanStartTime = null;
         this.loanDuration = 10 * 60 * 1000; // 10 minutes
         this.spinCost = 500;
         this.saveCost = 5000;
+
+        this.wheelLastSpinTime = null;
 
         this.onBalanceChange = null;
         this.onLoanUpdate = null;
@@ -18,10 +20,11 @@ class EconomyManager {
 
     async init() {
         const data = await this.sdk.loadData();
-        this.balance = data.balance ?? 100000;
+        this.balance = data.balance ?? 30000;
         this.inventory = data.inventory ?? [];
         this.loanAmount = data.loanAmount ?? 0;
         this.loanStartTime = data.loanStartTime ?? null;
+        this.wheelLastSpinTime = data.wheelLastSpinTime ?? null;
 
         this._triggerBalanceChange();
         if (this.loanAmount > 0) {
@@ -34,7 +37,8 @@ class EconomyManager {
             balance: this.balance,
             inventory: this.inventory,
             loanAmount: this.loanAmount,
-            loanStartTime: this.loanStartTime
+            loanStartTime: this.loanStartTime,
+            wheelLastSpinTime: this.wheelLastSpinTime
         });
     }
 
@@ -125,10 +129,11 @@ class EconomyManager {
     }
 
     async reset() {
-        this.balance = 100000;
+        this.balance = 30000;
         this.inventory = [];
         this.loanAmount = 0;
         this.loanStartTime = null;
+        this.wheelLastSpinTime = null;
         this.stopLoanTimer();
         await this.save();
     }

@@ -128,6 +128,115 @@ class PlateGenerator {
             fullStr: `${displayStr} | ${region}`
         };
     }
+
+
+    static generatePartial(plate, part) {
+        // part: 'letters', 'digits', 'region', 'frame'
+        let newPlate = { ...plate };
+
+        if (part === 'letters' && newPlate.type.id === 'normal') {
+            const letter1 = this.getRandomItem(LETTERS);
+            const letter2 = this.getRandomItem(LETTERS);
+            const letter3 = this.getRandomItem(LETTERS);
+            newPlate.sequence = `${letter1}${newPlate.sequence.substring(1, 4)}${letter2}${letter3}`;
+            newPlate.displayStr = `${newPlate.sequence[0]} ${newPlate.sequence.slice(1, 4)} ${newPlate.sequence.slice(4)}`;
+        } else if (part === 'digits' && newPlate.type.id === 'normal') {
+            const newDigits = this.generateSequence('DDD');
+            newPlate.sequence = `${newPlate.sequence[0]}${newDigits}${newPlate.sequence.substring(4, 6)}`;
+            newPlate.displayStr = `${newPlate.sequence[0]} ${newPlate.sequence.slice(1, 4)} ${newPlate.sequence.slice(4)}`;
+        } else if (part === 'region') {
+            const regions = [...ComboEvaluator.REGIONS.top, ...ComboEvaluator.REGIONS.capitals, ...ComboEvaluator.REGIONS.popular, ...ComboEvaluator.REGIONS.others];
+            newPlate.region = this.getRandomItem(regions, true);
+        } else if (part === 'frame') {
+            newPlate.frameText = this.getRandomItem(FRAME_TEXTS, true);
+            newPlate.frame = this.getRandomItem(FRAME_MATERIALS, true);
+        }
+
+        newPlate.fullStr = `${newPlate.displayStr} | ${newPlate.region.code}`;
+        return newPlate;
+    }
+
+
+    static generatePartial(plate, part) {
+        // part: 'letters', 'digits', 'region', 'frame'
+        let newPlate = { ...plate };
+
+        if (part === 'letters' && newPlate.type.id === 'normal') {
+            const letter1 = this.getRandomItem(LETTERS);
+            const letter2 = this.getRandomItem(LETTERS);
+            const letter3 = this.getRandomItem(LETTERS);
+            newPlate.sequence = `${letter1}${newPlate.sequence.substring(1, 4)}${letter2}${letter3}`;
+            newPlate.displayStr = `${newPlate.sequence[0]} ${newPlate.sequence.slice(1, 4)} ${newPlate.sequence.slice(4)}`;
+        } else if (part === 'digits' && newPlate.type.id === 'normal') {
+            const newDigits = this.generateSequence('DDD');
+            newPlate.sequence = `${newPlate.sequence[0]}${newDigits}${newPlate.sequence.substring(4, 6)}`;
+            newPlate.displayStr = `${newPlate.sequence[0]} ${newPlate.sequence.slice(1, 4)} ${newPlate.sequence.slice(4)}`;
+        } else if (part === 'region') {
+            newPlate.region = this.getRandomItem(REGIONS);
+        } else if (part === 'frame') {
+            newPlate.frameText = this.getRandomItem(FRAME_TEXTS, true);
+            // newPlate.frame = this.getRandomItem(FRAME_MATERIALS, true); // Keep frame as we only have one type for now
+        }
+
+        newPlate.fullStr = `${newPlate.displayStr} | ${newPlate.region}`;
+        return newPlate;
+    }
+
+    static generateWheelReward(tier) {
+        // tier: 'jackpot' or 'elite'
+        const type = TYPES.normal;
+        const format = FORMATS.normal;
+        let sequence, regionCode, wear, frame, basePrice;
+        let region;
+
+        if (tier === 'jackpot') {
+            wear = WEAR_STATES.new; // Factory new
+            frame = FRAME_MATERIALS.gold; // Gold frame
+
+            // Generate a 777 or AAA with 777 region
+            const p = Math.random();
+            if (p < 0.5) {
+                // X 777 XX 777
+                const letter = this.getRandomItem(LETTERS);
+                const secondLetter = this.getRandomItem(LETTERS);
+                sequence = `${letter}777${secondLetter}${secondLetter}`;
+            } else {
+                // A 001 MR 777
+                sequence = `А001МР`;
+            }
+            regionCode = '777';
+        } else if (tier === 'elite') {
+            wear = WEAR_STATES.new;
+            frame = FRAME_MATERIALS.carbon;
+
+            const eliteSeries = ['АМР', 'ЕКХ', 'ВОР', 'СКР', 'ХАМ'];
+            const randomSeries = this.getRandomItem(eliteSeries);
+            const digits = this.generateSequence('DDD');
+            sequence = `${randomSeries[0]}${digits}${randomSeries[1]}${randomSeries[2]}`;
+            regionCode = '77';
+        }
+
+        const regions = [
+            ...REGIONS.top, ...REGIONS.capitals, ...REGIONS.popular, ...REGIONS.others
+        ];
+        region = regions.find(r => r.code === regionCode) || REGIONS.others[0];
+        basePrice = type.basePrice;
+
+        let displayStr = `${sequence[0]} ${sequence.slice(1, 4)} ${sequence.slice(4)}`;
+
+        return {
+            type,
+            format,
+            sequence,
+            region,
+            wear,
+            frameText: {text: tier === 'jackpot' ? 'ВЕЛИКАЯ РОССИЯ' : 'СПЕЦСВЯЗЬ', type: 'gold'},
+            frame,
+            displayStr,
+            basePrice,
+            fullStr: `${displayStr} | ${regionCode}`
+        };
+    }
 }
 
 window.PlateGenerator = PlateGenerator;
