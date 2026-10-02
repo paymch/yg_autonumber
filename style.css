@@ -244,17 +244,24 @@ main {
 
 /* Bolts */
 .plate-bolt {
-    position: absolute;
     width: 6px; height: 6px;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #d1d5db, #4b5563);
-    box-shadow: 1px 1px 2px rgba(0,0,0,0.5), inset -1px -1px 2px rgba(0,0,0,0.8);
-    z-index: 10;
+    background: radial-gradient(circle at 30% 30%, #f3f4f6, #9ca3af);
+    box-shadow: inset 1px 1px 2px rgba(255,255,255,0.8), inset -1px -1px 2px rgba(0,0,0,0.5), 1px 1px 1px rgba(0,0,0,0.3);
+    position: relative;
 }
-.top-left { top: 3px; left: 15px; }
-.top-right { top: 3px; right: 15px; }
-.bottom-left { bottom: 20px; left: 15px; }
-.bottom-right { bottom: 20px; right: 15px; }
+.inner-bolt {
+    display: inline-block;
+    align-self: center;
+}
+.left-bolt {
+    margin-right: -4px;
+    margin-left: 2px;
+}
+.right-bolt {
+    margin-left: -4px;
+    margin-right: 2px;
+}
 
 .plate-inner {
     position: relative;
@@ -888,4 +895,206 @@ h2 { margin-bottom: 20px; text-align: center; font-weight: 800; letter-spacing: 
 
 .wheel-segment {
     background-color: transparent !important;
+}
+
+
+/* Wear States */
+.state-fn .plate-inner { /* Factory New */ }
+.state-mw .plate-inner { /* Minimal Wear */ }
+.state-mw::before {
+    content: ''; position: absolute; inset: 0;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.95" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.15"/></svg>');
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: 5;
+}
+.state-ft .plate-inner { /* Field Tested */ }
+.state-ft::before {
+    content: ''; position: absolute; inset: 0;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.25"/></svg>');
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 5;
+}
+.state-ww .plate-inner { /* Well Worn */ filter: contrast(0.9) brightness(0.9); }
+.state-ww::before {
+    content: ''; position: absolute; inset: 0;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.45" numOctaves="4" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.35"/></svg>');
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 5;
+}
+.state-bs .plate-inner { /* Battle Scarred */ filter: contrast(0.8) sepia(0.2) brightness(0.85); }
+.state-bs::before {
+    content: ''; position: absolute; inset: 0;
+    background: url('data:image/svg+xml;utf8,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="noiseFilter"><feTurbulence type="fractalNoise" baseFrequency="0.25" numOctaves="5" stitchTiles="stitch"/></filter><rect width="100%" height="100%" filter="url(%23noiseFilter)" opacity="0.45"/></svg>');
+    opacity: 0.4;
+    pointer-events: none;
+    z-index: 5;
+}
+.state-bs .plate-bolt {
+    background: radial-gradient(circle at 30% 30%, #8b4513, #3e1f06);
+    box-shadow: inset 1px 1px 2px rgba(0,0,0,0.8), 0 5px 10px rgba(139,69,19,0.5); /* Rust drip */
+}
+
+
+.tuning-controls {
+    display: flex;
+    justify-content: space-between;
+    width: 380px; /* Match plate width roughly */
+    margin: 0 auto;
+    gap: 5px;
+}
+.btn-tuning {
+    flex: 1;
+    font-size: 11px;
+    padding: 8px 4px;
+}
+
+
+.loan-title {
+    color: var(--text-muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.loan-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.loan-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s;
+}
+.loan-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+.loan-card-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+.loan-card-amount {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+    margin: 4px 0;
+}
+.loan-card-return {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+.loan-card .btn-bank-action {
+    background: var(--accent);
+    color: var(--bg-dark);
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 8px;
+    margin-top: 0;
+}
+.bank-modal-content {
+    max-width: 450px;
+    backdrop-filter: blur(10px);
+    background: rgba(15, 15, 20, 0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+
+.inventory-modal-content {
+    max-width: 800px;
+    width: 90%;
+    backdrop-filter: blur(10px);
+    background: rgba(15, 15, 20, 0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.inventory-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 12px;
+}
+.stat-box {
+    text-align: center;
+}
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+.stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-top: 5px;
+}
+.text-accent {
+    color: var(--accent);
+}
+.inventory-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+.inv-card {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+.inv-card .plate-wrapper {
+    transform: scale(0.45);
+    transform-origin: top center;
+    margin-bottom: -50px; /* offset the scale */
+}
+.inv-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+.inv-price {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    text-align: center;
+}
+.inv-wear, .inv-badge {
+    font-size: 11px;
+    text-align: center;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.1);
+}
+.inv-badge {
+    color: var(--rarity-epic);
+    border: 1px solid var(--rarity-epic);
+    background: rgba(168, 85, 247, 0.1);
+}
+
+
+.wheel-segment {
+    font-size: 16px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    font-weight: 800;
 }

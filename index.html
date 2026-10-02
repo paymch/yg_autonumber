@@ -59,12 +59,6 @@
             <div class="plate-presentation-area">
                 <div class="plate-container">
                     <div id="plate-wrapper" class="plate-wrapper normal state-new format-standard">
-                        <!-- Frame decorations -->
-                        <div class="plate-bolt top-left"></div>
-                        <div class="plate-bolt top-right"></div>
-                        <div class="plate-bolt bottom-left"></div>
-                        <div class="plate-bolt bottom-right"></div>
-
                         <!-- Plate content -->
                         <div class="plate-inner">
                             <div class="plate-main-part">
@@ -139,9 +133,9 @@
                     </button>
                 </div>
                 <div class="action-buttons hidden" id="action-buttons">
-                    <button id="btn-sell" class="btn-success action-btn glow-effect">
-                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 1v22"></path><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
-                        ПРОДАТЬ
+                    <button id="btn-sell" class="btn-secondary action-btn glow-effect">
+                        <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 6L6 18M6 6l12 12"></path></svg>
+                        ПРОПУСТИТЬ
                     </button>
                     <button id="btn-save" class="btn-warning action-btn glow-effect">
                         <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path><polyline points="17 21 17 13 7 13 7 21"></polyline><polyline points="7 3 7 8 15 8"></polyline></svg>
@@ -160,22 +154,42 @@
     <!-- Modals -->
     <!-- Bank Modal -->
     <div id="modal-bank" class="modal hidden">
-        <div class="modal-content">
+        <div class="modal-content bank-modal-content">
             <button class="close-modal">×</button>
             <h2>Банк</h2>
             <div id="bank-status">
                 <p>Кредитов нет.</p>
             </div>
             <div class="bank-actions">
-                <h3>Взять кредит (Комиссия 20%)</h3>
-                <p class="bank-warning">Таймер банкротства: 10 минут!</p>
-                <button class="btn-bank-action take-loan" data-amount="50000">50 000 ₽</button>
-                <button class="btn-bank-action take-loan" data-amount="100000">100 000 ₽</button>
-                <button class="btn-bank-action take-loan" data-amount="250000">250 000 ₽</button>
+                <h3 class="loan-title">Доступные кредиты (10 мин. на погашение)</h3>
+                <div class="loan-cards">
+                    <div class="loan-card">
+                        <div class="loan-card-name">Быстрый займ</div>
+                        <div class="loan-card-amount">50 000 ₽</div>
+                        <div class="loan-card-return">К возврату: 60 000 ₽</div>
+                        <button class="btn-bank-action take-loan" data-amount="50000">Оформить</button>
+                    </div>
+                    <div class="loan-card">
+                        <div class="loan-card-name">Автокредит</div>
+                        <div class="loan-card-amount">150 000 ₽</div>
+                        <div class="loan-card-return">К возврату: 185 000 ₽</div>
+                        <button class="btn-bank-action take-loan" data-amount="150000">Оформить</button>
+                    </div>
+                    <div class="loan-card">
+                        <div class="loan-card-name">Олигарх</div>
+                        <div class="loan-card-amount">500 000 ₽</div>
+                        <div class="loan-card-return">К возврату: 650 000 ₽</div>
+                        <button class="btn-bank-action take-loan" data-amount="500000">Оформить</button>
+                    </div>
+                </div>
             </div>
             <div id="repay-section" class="hidden">
-                <h3>Погашение кредита</h3>
-                <button id="btn-repay-loan" class="btn-success">Погасить долг</button>
+                <h3>Управление долгом</h3>
+                <button id="btn-repay-loan" class="btn-success mb-10">Погасить долг</button>
+                <button id="btn-halve-debt" class="btn-primary glow-effect">
+                    <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                    Смотреть рекламу (-50% от долга)
+                </button>
             </div>
         </div>
     </div>
@@ -204,13 +218,21 @@
     </div>
 
     <!-- Inventory Modal -->
-        <div class="modal-content">
+    <div id="modal-inventory" class="modal hidden">
+        <div class="modal-content inventory-modal-content">
             <button class="close-modal">×</button>
-            <h2>Гараж</h2>
-            <div class="inventory-stats">
-                Всего номеров: <span id="inventory-count">0</span>
+            <h2>МОЙ ГАРАЖ</h2>
+            <div class="inventory-stats glass-panel">
+                <div class="stat-box">
+                    <div class="stat-label">Вместимость</div>
+                    <div class="stat-value">Мест: <span id="inventory-count">0</span> / 20</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">Общая стоимость</div>
+                    <div class="stat-value text-accent"><span id="inventory-value">0</span> ₽</div>
+                </div>
             </div>
-            <div id="inventory-list" class="inventory-list">
+            <div id="inventory-list" class="inventory-grid">
                 <!-- Inventory items -->
             </div>
         </div>

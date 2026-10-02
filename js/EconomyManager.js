@@ -88,16 +88,35 @@ class EconomyManager {
         return false;
     }
 
+
     takeLoan(amount) {
         if (this.loanAmount > 0) return false; // Already has loan
 
-        this.loanAmount = amount * 1.2; // 20% interest
+        let toReturn = amount;
+        if (amount === 50000) toReturn = 60000;
+        else if (amount === 100000) toReturn = 120000;
+        else if (amount === 150000) toReturn = 185000;
+        else if (amount === 250000) toReturn = 300000;
+        else if (amount === 500000) toReturn = 650000;
+        else toReturn = amount * 1.2;
+
+        this.loanAmount = toReturn;
         this.loanStartTime = Date.now();
         this.add(amount);
         this.startLoanTimer();
         this.save();
         return true;
     }
+
+    halveDebt() {
+        if (this.loanAmount > 0) {
+            this.loanAmount = Math.floor(this.loanAmount / 2);
+            this.save();
+            return true;
+        }
+        return false;
+    }
+
 
     repayLoan() {
         if (this.loanAmount > 0 && this.canAfford(this.loanAmount)) {

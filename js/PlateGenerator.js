@@ -1,4 +1,9 @@
-const REGIONS = ['77', '99', '97', '177', '199', '197', '777', '799', '797', '50', '90', '150', '190', '750', '02', '102', '16', '116', '23', '93', '123', '54', '154', '78', '98', '178', '198'];
+const REGIONS = {
+    top: [{code:'777', bonus: 3.0}, {code:'999', bonus: 3.0}, {code:'799', bonus: 2.5}],
+    capitals: [{code:'77', bonus: 2.0}, {code:'99', bonus: 2.0}, {code:'97', bonus: 1.8}, {code:'177', bonus: 1.8}, {code:'199', bonus: 1.8}, {code:'197', bonus: 1.8}, {code:'78', bonus: 2.0}, {code:'98', bonus: 2.0}, {code:'178', bonus: 1.8}, {code:'198', bonus: 1.8}],
+    popular: [{code:'116', bonus: 1.5}, {code:'716', bonus: 1.5}, {code:'123', bonus: 1.5}, {code:'193', bonus: 1.5}, {code:'125', bonus: 1.5}, {code:'05', bonus: 1.5}, {code:'95', bonus: 1.5}],
+    others: [{code:'50', bonus: 1.0}, {code:'90', bonus: 1.0}, {code:'150', bonus: 1.0}, {code:'190', bonus: 1.0}, {code:'750', bonus: 1.0}, {code:'02', bonus: 1.0}, {code:'102', bonus: 1.0}, {code:'16', bonus: 1.0}, {code:'23', bonus: 1.0}, {code:'93', bonus: 1.0}, {code:'54', bonus: 1.0}, {code:'154', bonus: 1.0}]
+};
 const LETTERS = ['А', 'В', 'Е', 'К', 'М', 'Н', 'О', 'Р', 'С', 'Т', 'У', 'Х'];
 const DIGITS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 
@@ -29,16 +34,31 @@ const FRAME_TEXTS = {
     DEALER2: { id: 'dealer2', text: 'АВТОМИР', weight: 15, mult: 1.0, type: 'common' },
     DEALER3: { id: 'dealer3', text: 'MAJOR', weight: 10, mult: 1.0, type: 'common' },
 
-    RARE1: { id: 'rare1', text: 'РОССИЯ', weight: 8, mult: 1.2, type: 'rare' },
-    RARE2: { id: 'rare2', text: 'RUSSIAN FEDERATION', weight: 5, mult: 1.25, type: 'rare' },
+    RARE1: { id: 'rare1', text: 'РОССИЯ', weight: 8, mult: 1.15, type: 'rare' },
+    RARE2: { id: 'rare2', text: 'РОССИЙСКАЯ ФЕДЕРАЦИЯ', weight: 5, mult: 1.25, type: 'rare' },
+    RARE3: { id: 'rare3', text: 'DRIVE2', weight: 8, mult: 1.15, type: 'rare' },
+    RARE4: { id: 'rare4', text: 'SMOTRA', weight: 5, mult: 1.2, type: 'rare' },
+    RARE5: { id: 'rare5', text: 'MOTORSPORT', weight: 5, mult: 1.15, type: 'rare' },
 
-    EPIC1: { id: 'epic1', text: 'СЛУЖБА БЕЗОПАСНОСТИ', weight: 3, mult: 1.4, type: 'epic' },
-    EPIC2: { id: 'epic2', text: 'МВД РОССИИ', weight: 2, mult: 1.45, type: 'epic' },
-    EPIC3: { id: 'epic3', text: 'УПРАВЛЕНИЕ ПО УПРАВЛЕНИЮ...', weight: 1.5, mult: 1.5, type: 'epic' },
+    EPIC1: { id: 'epic1', text: 'ГОСУДАРСТВЕННАЯ ДУМА', weight: 3, mult: 1.4, type: 'epic' },
+    EPIC2: { id: 'epic2', text: 'ГУОБДД МВД РОССИИ', weight: 2, mult: 1.45, type: 'epic' },
+    EPIC3: { id: 'epic3', text: 'ОТДЕЛ ПО БОРЬБЕ С ПОНТАМИ', weight: 1.5, mult: 1.5, type: 'epic' },
 
-    LEGEND1: { id: 'leg1', text: 'ВЕЛИКАЯ РОССИЯ', weight: 0.3, mult: 2.5, type: 'legendary' },
-    LEGEND2: { id: 'leg2', text: 'ФЕДЕРАЛЬНАЯ СЛУЖБА БЕЗОПАСНОСТИ', weight: 0.1, mult: 2.0, type: 'legendary' },
-    LEGEND3: { id: 'leg3', text: 'СПЕЦСВЯЗЬ ПРЕЗИДЕНТА РФ', weight: 0.1, mult: 2.2, type: 'legendary' }
+    LEGEND1: { id: 'leg1', text: 'ВЕЛИКАЯ РОССИЯ', weight: 0.3, mult: 1.8, type: 'legendary' },
+    LEGEND2: { id: 'leg2', text: 'ФСБ РОССИИ', weight: 0.1, mult: 2.0, type: 'legendary' },
+    LEGEND3: { id: 'leg3', text: 'СПЕЦСВЯЗЬ', weight: 0.1, mult: 1.7, type: 'legendary' },
+    LEGEND4: { id: 'leg4', text: 'АДМИНИСТРАЦИЯ ПРЕЗИДЕНТА', weight: 0.05, mult: 2.0, type: 'legendary' },
+    LEGEND5: { id: 'leg5', text: 'УПРАВЛЕНИЕ ПО УПРАВЛЕНИЮ...', weight: 0.05, mult: 2.0, type: 'legendary' }
+};
+
+const FRAME_MATERIALS = {
+    BLACK: { id: 'black', name: 'Черный мат', weight: 40, mult: 1.0, css: 'mat-black' },
+    GREY: { id: 'grey', name: 'Серый пластик', weight: 25, mult: 1.0, css: 'mat-grey' },
+    WHITE: { id: 'white', name: 'Белый', weight: 15, mult: 1.05, css: 'mat-white' },
+    BLUE: { id: 'blue', name: 'Синий металлик', weight: 10, mult: 1.1, css: 'mat-blue' },
+    CHROME: { id: 'chrome', name: 'Темный хром', weight: 5, mult: 1.25, css: 'mat-chrome' },
+    CARBON: { id: 'carbon', name: 'Карбон', weight: 3, mult: 1.5, css: 'mat-carbon' },
+    GOLD: { id: 'gold', name: 'Золото', weight: 1, mult: 2.0, css: 'mat-gold' }
 };
 
 class PlateGenerator {
@@ -78,7 +98,9 @@ class PlateGenerator {
         const format = type.id === 'normal' ? this.getRandomItem(PLATE_FORMATS, true) : PLATE_FORMATS.STANDARD;
         const wear = this.getRandomItem(WEAR_LEVELS, true);
         const frameText = this.getRandomItem(FRAME_TEXTS, true);
-        const region = this.getRandomItem(REGIONS);
+        const frame = this.getRandomItem(FRAME_MATERIALS, true);
+        const regionPool = [...REGIONS.top, ...REGIONS.capitals, ...REGIONS.popular, ...REGIONS.others];
+        const region = this.getRandomItem(regionPool, false);
 
         const basePrice = Math.floor(Math.random() * (type.maxBase - type.minBase + 1)) + type.minBase;
 
@@ -121,6 +143,7 @@ class PlateGenerator {
             format,
             wear,
             frameText,
+            frame,
             region,
             sequence,
             displayStr,

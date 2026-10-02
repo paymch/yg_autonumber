@@ -4,6 +4,7 @@ class UIManager {
         this.currentPlate = null;
         this.currentEval = null;
         this.isSpinning = false;
+        this.spinsSinceAd = 0;
 
         this.bindElements();
         this.bindEvents();
@@ -84,7 +85,7 @@ class UIManager {
             // Setup wheel UI periodically
             setInterval(() => this.updateWheelTimer(), 1000);
         }
-        this.el.btnSell.addEventListener('click', () => this.sellCurrent());
+        this.el.btnSell.addEventListener('click', () => this.skipCurrent());
         this.el.btnSave.addEventListener('click', () => this.saveCurrent());
 
         this.el.btnInventory.addEventListener('click', () => this.showInventory());
@@ -106,6 +107,33 @@ class UIManager {
                 }
             });
         });
+
+
+        const btnHalveDebt = document.getElementById('btn-halve-debt');
+        if (btnHalveDebt) {
+            btnHalveDebt.addEventListener('click', () => {
+                if (window.ysdkManager) window.ysdkManager.stopGameplay();
+                if (window.ysdkManager) {
+                    window.ysdkManager.showRewardedVideo(
+                        () => {
+                            if(window.ysdkManager) window.ysdkManager.startGameplay();
+                            if (this.eco.halveDebt()) {
+                                sounds.alert();
+                                this.showBank(); // refresh UI
+                            }
+                        },
+                        () => {
+                            if(window.ysdkManager) window.ysdkManager.startGameplay();
+                        }
+                    );
+                } else {
+                    if (this.eco.halveDebt()) {
+                        sounds.alert();
+                        this.showBank(); // refresh UI
+                    }
+                }
+            });
+        }
 
         this.el.btnRepayLoan.addEventListener('click', () => {
             if (this.eco.repayLoan()) {
@@ -216,6 +244,10 @@ class UIManager {
     }
 
     async spinPartial(part) {
+        if (!this.currentPlate) {
+            // Generate full plate first to replace the ??? state
+            this.currentPlate = PlateGenerator.generatePlate();
+        }
         if (this.isSpinning) return;
 
         let cost = 0;
@@ -257,7 +289,25 @@ class UIManager {
 
     async spin() {
         if (this.isSpinning) return;
-        if (!this.eco.deduct(this.eco.spinCost)) return;
+        if (!this.eco.deduct(this.eco.spinCost)) {
+            // Can't afford
+            if (this.eco.balance < this.eco.spinCost && !this.el.btnReward.classList.contains('hidden')) {
+                alert("Недостаточно средств. Воспользуйтесь банком или посмотрите рекламу за бонус!");
+            }
+            return;
+        }
+
+        this.spinsSinceAd++;
+        if (this.spinsSinceAd >= 9) {
+            this.spinsSinceAd = 0;
+            if (window.ysdkManager) {
+                window.ysdkManager.stopGameplay();
+                window.ysdkManager.showInterstitial(
+                    () => { window.ysdkManager.startGameplay(); },
+                    () => { window.ysdkManager.startGameplay(); }
+                );
+            }
+        }
 
         sounds.resume();
         this.isSpinning = true;
@@ -492,10 +542,9 @@ class UIManager {
         }
     }
 
-    sellCurrent() {
+    skipCurrent() {
         if (!this.currentPlate) return;
         sounds.click();
-        this.eco.add(this.currentEval.finalPrice);
         this.resetPlateArea();
     }
 
@@ -527,31 +576,53 @@ class UIManager {
         sounds.click();
         this.el.inventoryCount.innerText = this.eco.inventory.length;
 
-        if (this.eco.inventory.length === 0) {
-            this.el.inventoryList.innerHTML = '<p class="text-center text-muted">В гараже пусто.</p>';
-        } else {
-            this.el.inventoryList.innerHTML = this.eco.inventory.map(item => `
-                <div class="inventory-item">
-                    <div>
-                        <div class="inventory-plate-str">${item.plate.fullStr}</div>
-                        <div class="inventory-price">${item.evaluation.finalPrice.toLocaleString()} ₽</div>
-                    </div>
-                    <button class="btn-success btn-sell-inv" data-id="${item.id}">Продать</button>
-                </div>
-            `).join('');
+        let totalValue = 0;
+        this.el.inventoryList.innerHTML = '';
 
-            this.el.inventoryList.querySelectorAll('.btn-sell-inv').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = e.target.dataset.id;
-                    if (this.eco.sellPlateFromInventory(id)) {
-                        sounds.click();
-                        this.showInventory(); // Refresh
-                    }
-                });
+        if (this.eco.inventory.length === 0) {
+            this.el.inventoryList.innerHTML = '<p class="text-center w-full mt-20 text-muted">Гараж пуст</p>';
+        } else {
+            this.eco.inventory.forEach((plate, idx) => {
+                const evalData = ComboEvaluator.evaluate(plate);
+                totalValue += evalData.finalPrice;
+
+                const card = document.createElement('div');
+                card.className = 'inv-card';
+                card.innerHTML = `
+                    <div class="plate-wrapper ${plate.type.id} ${plate.wear.css} ${plate.frame ? plate.frame.css : ''} format-${plate.format.id}">
+                        <div class="plate-bolt inner-bolt left-bolt"></div>
+                        <div class="plate-inner">
+                            <div class="plate-main-part">
+                                <span class="plate-char">${plate.sequence[0]}</span>
+                                <div class="plate-group">
+                                    <span class="plate-digit">${plate.sequence[1]}</span>
+                                    <span class="plate-digit">${plate.sequence[2]}</span>
+                                    <span class="plate-digit">${plate.sequence[3]}</span>
+                                </div>
+                                <div class="plate-group-letters">
+                                    <span class="plate-char">${plate.sequence[4]}</span>
+                                    <span class="plate-char">${plate.sequence[5]}</span>
+                                </div>
+                            </div>
+                            <div class="plate-region-part">
+                                <div class="region-code">${plate.region.code}</div>
+                            </div>
+                        </div>
+                        <div class="plate-bolt inner-bolt right-bolt"></div>
+                        <div class="plate-frame-bottom"><span class="frame-text ${plate.frameText.type}">${plate.frameText.text}</span></div>
+                    </div>
+                    <div class="inv-details">
+                        <div class="inv-price">${evalData.finalPrice.toLocaleString('ru-RU')} ₽</div>
+                        <div class="inv-wear">${plate.wear.name}</div>
+                    </div>
+                `;
+                this.el.inventoryList.appendChild(card);
             });
         }
 
-        this.el.modalInventory.classList.remove('hidden');
+        document.getElementById('inventory-value').innerText = totalValue.toLocaleString('ru-RU');
+
+        document.getElementById('modal-inventory').classList.remove('hidden');
     }
 
     showBank() {
