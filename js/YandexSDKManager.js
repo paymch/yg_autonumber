@@ -31,7 +31,7 @@ class YandexSDKManager {
 
     async loadData() {
         const defaultData = {
-            balance: 100000,
+            balance: 30000,
             inventory: [],
             loanAmount: 0,
             loanStartTime: null

@@ -21,6 +21,11 @@ class EconomyManager {
     async init() {
         const data = await this.sdk.loadData();
         this.balance = data.balance ?? 30000;
+
+        if (this.balance > 50000) {
+            this.balance = 30000;
+        }
+
         this.inventory = data.inventory ?? [];
         this.loanAmount = data.loanAmount ?? 0;
         this.loanStartTime = data.loanStartTime ?? null;

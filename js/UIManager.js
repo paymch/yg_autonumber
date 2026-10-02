@@ -433,7 +433,7 @@ class UIManager {
         }
 
         this.el.plateMain.innerHTML = html;
-        this.el.plateRegionCode.innerText = plate.region;
+        this.el.plateRegionCode.innerText = plate.region.code || plate.region;
     }
 
     spawnParticles(color1, color2, count) {
@@ -693,9 +693,24 @@ class UIManager {
             segments.forEach((seg, i) => {
                 const el = document.createElement('div');
                 el.className = 'wheel-segment';
-                el.style.backgroundColor = seg.color;
-                el.style.transform = `rotate(${i * anglePerSegment}deg)`;
-                el.innerText = seg.name;
+                // Calculate the center of the 60deg slice
+                // The gradient starts at 0deg (top). First slice is 0-60deg. Center is 30deg.
+                // However, top in CSS rotations for the absolute element we created (top: 50%, left: 50%, transform-origin: 0% 50%)
+                // 0deg rotation means it points exactly to the right.
+                // So we need to subtract 90 degrees to point to the top, which is what the conic gradient expects.
+                const sliceCenter = (i * anglePerSegment) + (anglePerSegment / 2) - 90;
+                el.style.transform = `rotate(${sliceCenter}deg)`;
+
+                const span = document.createElement('span');
+                span.innerText = seg.name;
+
+                // If text is pointing to the left side (angle between 90 and 270), flip it 180deg
+                const absoluteAngle = (sliceCenter % 360 + 360) % 360;
+                if (absoluteAngle > 90 && absoluteAngle < 270) {
+                    span.style.transform = 'rotate(180deg)';
+                }
+
+                el.appendChild(span);
                 this.el.wheelCircle.appendChild(el);
             });
 
