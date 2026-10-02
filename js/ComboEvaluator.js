@@ -82,7 +82,7 @@ class ComboEvaluator {
         }
 
         // Formula: Итого = (Base + Bonus) * WearMult * FrameTextMult * ComboMult * FormatMult
-        let finalPrice = Math.floor(
+        let finalPrice = Math.round(
             (basePrice + maxTier.priceBonus) *
             plate.wear.mult *
             plate.frameText.mult *

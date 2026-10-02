@@ -385,27 +385,44 @@ main {
 .plate-wrapper.diplomat .plate-region-part::before { background: rgba(0,0,0,0.4); }
 
 /* Formats */
-.format-square { width: 220px; }
-.format-square .plate-inner { flex-direction: column; height: 140px; }
-.format-square .plate-main-part { font-size: 3.2rem; }
-.format-square .plate-char { font-size: 2.2rem; }
-.format-square .plate-region-part {
-    width: 100%;
-    border-left: none;
-    border-top: 2px solid rgba(0,0,0,0.8);
-    flex-direction: row;
+.format-square { width: 200px; }
+.format-square .plate-inner {
+    display: grid;
+    grid-template-columns: 1fr 65px;
+    grid-template-rows: 1fr 1fr;
+    height: 130px;
+}
+.format-square .plate-main-part { display: contents; }
+.format-square .plate-row-top {
+    grid-column: 1 / -1;
+    display: flex;
     justify-content: center;
-    gap: 15px;
-    padding: 5px 0;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 2px solid rgba(0,0,0,0.8);
 }
-.format-square .plate-region-part::before {
-    left: 0; right: 0; top: -3px; height: 1px; width: auto;
+.format-square .plate-row-bottom {
+    grid-column: 1 / 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
-.format-square.police .plate-region-part,
-.format-square.military .plate-region-part,
-.format-square.diplomat .plate-region-part {
-    border-top-color: rgba(255,255,255,0.8);
+.format-square .plate-region-part {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+    border-left: 2px solid rgba(0,0,0,0.8);
+    border-top: none;
 }
+.format-square.police .plate-row-bottom,
+.format-square.military .plate-row-bottom,
+.format-square.diplomat .plate-row-bottom {
+    border-top-color: transparent;
+}
+.format-square .plate-gloss-overlay { grid-column: 1 / -1; grid-row: 1 / -1; }
+.format-square .plate-char { font-size: 2.6rem; line-height: 1; }
+.format-square .plate-digit { font-size: 3.6rem; line-height: 1; margin-top: 0; }
+.format-square .plate-group { gap: 2px; }
+.format-square .plate-group-letters { gap: 5px; }
 
 /* Frame States (Carbon, Chrome, Gold) */
 .state-carbon {

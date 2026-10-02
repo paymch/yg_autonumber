@@ -74,7 +74,8 @@ class PlateGenerator {
 
     static generatePlate() {
         const type = this.getRandomItem(PLATE_TYPES, true);
-        const format = this.getRandomItem(PLATE_FORMATS, true);
+        // Square format is currently only supported in layout for 'normal' type plates
+        const format = type.id === 'normal' ? this.getRandomItem(PLATE_FORMATS, true) : PLATE_FORMATS.STANDARD;
         const wear = this.getRandomItem(WEAR_LEVELS, true);
         const frameText = this.getRandomItem(FRAME_TEXTS, true);
         const region = this.getRandomItem(REGIONS);

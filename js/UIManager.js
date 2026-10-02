@@ -207,16 +207,33 @@ class UIManager {
         // Parse sequence to HTML with exact GOST margins using gap/margin classes
         let html = '';
         if (plate.type.id === 'normal') {
-            html = `<span class="plate-char">${plate.sequence[0]}</span>
-                    <div class="plate-group">
-                        <span class="plate-digit">${plate.sequence[1]}</span>
-                        <span class="plate-digit">${plate.sequence[2]}</span>
-                        <span class="plate-digit">${plate.sequence[3]}</span>
-                    </div>
-                    <div class="plate-group-letters">
-                        <span class="plate-char">${plate.sequence[4]}</span>
-                        <span class="plate-char">${plate.sequence[5]}</span>
-                    </div>`;
+            if (plate.format && plate.format.id === 'square') {
+                html = `<div class="plate-row-top">
+                            <span class="plate-char">${plate.sequence[0]}</span>
+                            <div class="plate-group">
+                                <span class="plate-digit">${plate.sequence[1]}</span>
+                                <span class="plate-digit">${plate.sequence[2]}</span>
+                                <span class="plate-digit">${plate.sequence[3]}</span>
+                            </div>
+                        </div>
+                        <div class="plate-row-bottom">
+                            <div class="plate-group-letters">
+                                <span class="plate-char">${plate.sequence[4]}</span>
+                                <span class="plate-char">${plate.sequence[5]}</span>
+                            </div>
+                        </div>`;
+            } else {
+                html = `<span class="plate-char">${plate.sequence[0]}</span>
+                        <div class="plate-group">
+                            <span class="plate-digit">${plate.sequence[1]}</span>
+                            <span class="plate-digit">${plate.sequence[2]}</span>
+                            <span class="plate-digit">${plate.sequence[3]}</span>
+                        </div>
+                        <div class="plate-group-letters">
+                            <span class="plate-char">${plate.sequence[4]}</span>
+                            <span class="plate-char">${plate.sequence[5]}</span>
+                        </div>`;
+            }
         } else if (plate.type.id === 'taxi') {
             html = `<div class="plate-group-letters">
                         <span class="plate-char">${plate.sequence[0]}</span>
