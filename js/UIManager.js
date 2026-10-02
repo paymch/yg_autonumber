@@ -15,6 +15,7 @@ class UIManager {
             plateWrapper: document.getElementById('plate-wrapper'),
             plateMain: document.querySelector('.plate-main-part'),
             plateRegionCode: document.querySelector('.region-code'),
+            plateFrameBottom: document.querySelector('.plate-frame-bottom .frame-text'),
             plateStamp: document.getElementById('plate-stamp'),
             vfxContainer: document.getElementById('vfx-container'),
             scanLine: document.querySelector('.scan-line'),
@@ -186,7 +187,11 @@ class UIManager {
         this.renderPlate(this.currentPlate);
 
         // Apply classes
-        this.el.plateWrapper.className = `plate-wrapper ${this.currentPlate.type.id} state-${this.currentPlate.state.id} format-${this.currentPlate.format.id}`;
+        this.el.plateWrapper.className = `plate-wrapper ${this.currentPlate.type.id} ${this.currentPlate.wear.css} format-${this.currentPlate.format.id}`;
+
+        // Frame text
+        this.el.plateFrameBottom.innerText = this.currentPlate.frameText.text;
+        this.el.plateFrameBottom.className = `frame-text text-${this.currentPlate.frameText.type}`;
 
         // Scan effect
         this.el.plateWrapper.classList.add('scanning');
@@ -199,38 +204,56 @@ class UIManager {
     }
 
     renderPlate(plate) {
-        // Parse sequence to HTML
+        // Parse sequence to HTML with exact GOST margins using gap/margin classes
         let html = '';
         if (plate.type.id === 'normal') {
-            html = `<span class="plate-char char-1">${plate.sequence[0]}</span>
-                    <span class="plate-digit digit-1">${plate.sequence[1]}</span>
-                    <span class="plate-digit digit-2">${plate.sequence[2]}</span>
-                    <span class="plate-digit digit-3">${plate.sequence[3]}</span>
-                    <span class="plate-char char-2">${plate.sequence[4]}</span>
-                    <span class="plate-char char-3">${plate.sequence[5]}</span>`;
+            html = `<span class="plate-char">${plate.sequence[0]}</span>
+                    <div class="plate-group">
+                        <span class="plate-digit">${plate.sequence[1]}</span>
+                        <span class="plate-digit">${plate.sequence[2]}</span>
+                        <span class="plate-digit">${plate.sequence[3]}</span>
+                    </div>
+                    <div class="plate-group-letters">
+                        <span class="plate-char">${plate.sequence[4]}</span>
+                        <span class="plate-char">${plate.sequence[5]}</span>
+                    </div>`;
         } else if (plate.type.id === 'taxi') {
-            html = `<span class="plate-char char-1">${plate.sequence[0]}</span>
-                    <span class="plate-char char-2">${plate.sequence[1]}</span>
-                    <span class="plate-digit digit-1">${plate.sequence[2]}</span>
-                    <span class="plate-digit digit-2">${plate.sequence[3]}</span>
-                    <span class="plate-digit digit-3">${plate.sequence[4]}</span>`;
+            html = `<div class="plate-group-letters">
+                        <span class="plate-char">${plate.sequence[0]}</span>
+                        <span class="plate-char">${plate.sequence[1]}</span>
+                    </div>
+                    <div class="plate-group taxi-digits">
+                        <span class="plate-digit">${plate.sequence[2]}</span>
+                        <span class="plate-digit">${plate.sequence[3]}</span>
+                        <span class="plate-digit">${plate.sequence[4]}</span>
+                    </div>`;
         } else if (plate.type.id === 'police') {
-            html = `<span class="plate-char char-1">${plate.sequence[0]}</span>
-                    <span class="plate-digit digit-1">${plate.sequence[1]}</span>
-                    <span class="plate-digit digit-2">${plate.sequence[2]}</span>
-                    <span class="plate-digit digit-3">${plate.sequence[3]}</span>
-                    <span class="plate-digit digit-4">${plate.sequence[4]}</span>`;
+            html = `<span class="plate-char">${plate.sequence[0]}</span>
+                    <div class="plate-group police-digits">
+                        <span class="plate-digit">${plate.sequence[1]}</span>
+                        <span class="plate-digit">${plate.sequence[2]}</span>
+                        <span class="plate-digit">${plate.sequence[3]}</span>
+                        <span class="plate-digit">${plate.sequence[4]}</span>
+                    </div>`;
         } else if (plate.type.id === 'military') {
-             html = `<span class="plate-digit digit-1">${plate.sequence[0]}</span>
-                    <span class="plate-digit digit-2">${plate.sequence[1]}</span>
-                    <span class="plate-digit digit-3">${plate.sequence[2]}</span>
-                    <span class="plate-digit digit-4">${plate.sequence[3]}</span>
-                    <span class="plate-char char-1">${plate.sequence[4]}</span>
-                    <span class="plate-char char-2">${plate.sequence[5]}</span>`;
+             html = `<div class="plate-group">
+                        <span class="plate-digit">${plate.sequence[0]}</span>
+                        <span class="plate-digit">${plate.sequence[1]}</span>
+                        <span class="plate-digit">${plate.sequence[2]}</span>
+                        <span class="plate-digit">${plate.sequence[3]}</span>
+                    </div>
+                    <div class="plate-group-letters military-letters">
+                        <span class="plate-char">${plate.sequence[4]}</span>
+                        <span class="plate-char">${plate.sequence[5]}</span>
+                    </div>`;
         } else if (plate.type.id === 'diplomat') {
              const parts = plate.displayStr.split(' ');
-             html = `<span class="plate-digit">${parts[0]}</span>
-                     <span class="plate-char highlight">${parts[1]}</span>
+             html = `<div class="plate-group">
+                        <span class="plate-digit">${parts[0][0]}</span>
+                        <span class="plate-digit">${parts[0][1]}</span>
+                        <span class="plate-digit">${parts[0][2]}</span>
+                     </div>
+                     <span class="plate-char highlight dip-char">${parts[1]}</span>
                      <span class="plate-digit">${parts[2]}</span>`;
         }
 
@@ -298,18 +321,21 @@ class UIManager {
 
         // Render Price Breakdown
         const b = this.currentEval.breakdown;
-        let detailsHtml = `<div class="eval-row"><span>База:</span><span>${b.base.toLocaleString()} ₽</span></div>`;
+        let detailsHtml = `<div class="eval-row"><span>Базовая оценка:</span><span>${b.base.toLocaleString()} ₽</span></div>`;
         if (b.comboBonus > 0) {
-            detailsHtml += `<div class="eval-row"><span>Бонус комбинации:</span><span>+${b.comboBonus.toLocaleString()} ₽</span></div>`;
+            detailsHtml += `<div class="eval-row"><span>Комбо-бонус:</span><span>+${b.comboBonus.toLocaleString()} ₽</span></div>`;
         }
         if (b.comboMult > 1) {
-            detailsHtml += `<div class="eval-row"><span>Множитель редкости:</span><span>x${b.comboMult}</span></div>`;
+            detailsHtml += `<div class="eval-row"><span>Множитель комбинации:</span><span>x${b.comboMult}</span></div>`;
         }
-        if (b.stateMult !== 1) {
-            detailsHtml += `<div class="eval-row"><span>Состояние (${this.currentPlate.state.name}):</span><span>x${b.stateMult}</span></div>`;
+        if (b.wearMult !== 1) {
+            detailsHtml += `<div class="eval-row"><span>Износ (${this.currentPlate.wear.name}):</span><span>x${b.wearMult}</span></div>`;
+        }
+        if (b.frameMult !== 1) {
+            detailsHtml += `<div class="eval-row"><span>Рамка:</span><span>x${b.frameMult}</span></div>`;
         }
         if (b.formatMult !== 1) {
-            detailsHtml += `<div class="eval-row"><span>Формат (${this.currentPlate.format.name}):</span><span>x${b.formatMult}</span></div>`;
+            detailsHtml += `<div class="eval-row"><span>Формат ГОСТ:</span><span>x${b.formatMult}</span></div>`;
         }
 
         this.el.evalDetails.innerHTML = detailsHtml;
@@ -366,9 +392,10 @@ class UIManager {
         this.el.plateStamp.classList.remove('stamp-anim');
         this.el.vfxContainer.innerHTML = '';
         this.el.btnSpin.classList.remove('hidden');
-        this.el.plateWrapper.className = 'plate-wrapper normal state-new format-standard';
-        this.el.plateMain.innerHTML = `<span class="plate-char char-1">?</span><span class="plate-digit digit-1">?</span><span class="plate-digit digit-2">?</span>`;
+        this.el.plateWrapper.className = 'plate-wrapper normal state-fn format-standard';
+        this.el.plateMain.innerHTML = `<span class="plate-char">?</span><div class="plate-group"><span class="plate-digit">?</span><span class="plate-digit">?</span><span class="plate-digit">?</span></div>`;
         this.el.plateRegionCode.innerText = '??';
+        this.el.plateFrameBottom.innerText = '';
     }
 
     showInventory() {
